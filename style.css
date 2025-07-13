@@ -1,0 +1,201 @@
+body {
+  min-height: 100vh; /* 画面全体の高さに合わせる */
+  padding-bottom: 265px; /* スクロール余白を追加 */
+}
+
+.page,
+.answer {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+button:not(.keyboard__key) {
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:not(.keyboard__key):hover {
+  background-color: #45a049;
+}
+
+button:not(.keyboard__key):disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+input {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  margin: 6px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-container .checkmark {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #888;
+  border-radius: 4px;
+  margin-right: 8px;
+  position: relative;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+  background-color: #0078d4;
+  border-color: #0078d4;
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.title {
+  text-align: center;
+  font-size: clamp(12px, 5vw, 35px);
+  margin: 16px 0;
+  color: #333;
+}
+
+.root,
+.test,
+.result {
+  text-align: center;
+  margin: 8px 30px 8px 30px; /* 上 右 下 左 */
+}
+
+.question {
+  font-size: clamp(12px, 5vw, 25px);
+  text-align: center;
+  line-height: 1.5;
+  min-height: 1.5em;
+  white-space: pre-wrap;
+  padding: 6px 12px;
+  background-color: #f0f8ff; /* 薄い青 */
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  color: #333;
+  margin: 8px 30px 8px 30px; /* 上 右 下 左 */
+}
+
+.answer {
+  font-size: clamp(12px, 5vw, 20px);
+  text-align: center;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  min-height: 1.5em;
+  padding: 6px 12px;
+  background-color: #fffec8ff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  color: #333;
+  margin: 8px 30px 8px 30px; /* 上 右 下 左 */
+}
+
+/* ---------------------------------- */
+.keyboard {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 5px 0;
+  background-color: #53a6bb;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  user-select: none;
+  transition: bottom 0.4s;
+}
+
+.keyboard--hidden {
+  bottom: -100%;
+}
+
+.keyboard__keys {
+  text-align: center;
+}
+
+.keyboard__key {
+  width: 8%;
+  height: 45px;
+  margin: 3px;
+  border-radius: 4px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 0;
+  vertical-align: top;
+  -webkit-tap-highlight-color: transparent;
+  font-size: 20px;
+}
+
+.keyboard__key:active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.keyboard__key--wide {
+  width: 13%;
+}
+
+.keyboard__key--extra--wide {
+  width: 50%;
+  max-width: 500px;
+}
+
+.keyboard__key--active::after {
+  /* background: #08ff00; */
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.keyboard__key--dark {
+  background: rgba(0, 0, 0, 0.5);
+}

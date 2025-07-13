@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>なんでもFlashCards v1.00</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <h1 class="title">なんでもFlashCards v0.1</h1>
+    <div id="root" class="page root active">
+      <div>
+        <p>
+          csv形式で作成した単語テストを実行できるWebアプリです<br />
+          問題データを自分で作成することもできます<br />
+          カスタム作問が可能のため問題のダウンロードが必須となってしまいますが一度設定すればずっと使えます
+        </p>
+        <a href="https://drive.google.com/drive/folders/1IUnjADMPMu0oYnbcgvYCyQOCTo_BF5XR?usp=sharing">問題データの例はこちら</a>
+        <p>某T氏が某英単語テストサイトを落としたことで本格的に作ろうと思いました</p>
+      </div>
+      <div>
+        <select id="wordData" onchange="loadWordFile()">
+          <option value="" disabled selected>問題を選択してください</option>
+        </select>
+        <button id="selectWordDataFolder" onclick="selectWordDataFolder()" class="">問題フォルダの選択</button>
+        <p></p>
+        <button id="reloadFileList" onclick="loadWordDataList()" class="">Reload</button>
+      </div>
+
+      <div>
+        <p id="FileData"></p>
+      </div>
+
+      <div>
+        <p>出題範囲絞り込み</p>
+        <label id="wordIdText" for="wordFrom">ID</label>
+        <input type="number" name="from" id="wordFrom" value="1" onchange="filterWordData()" />
+        <label for="wordTo">～</label>
+        <input type="number" name="to" id="wordTo" value="100" onchange="filterWordData()" />
+      </div>
+
+      <div>
+        <p>出題方式設定</p>
+        <label class="checkbox-container">
+          <input type="checkbox" id="random" onchange="saveFilter()" />
+          <span class="checkmark"></span>
+          +RANDOM ランダム出題
+        </label>
+        <label class="checkbox-container">
+          <input type="checkbox" id="initials" onchange="saveFilter()" />
+          <span class="checkmark"></span>
+          +INITIALS 頭文字の表示
+        </label>
+      </div>
+
+      <div>
+        <p id="filteredData"></p>
+      </div>
+
+      <div>
+        <button id="start" disabled onclick="startTest()" class="">Start</button>
+      </div>
+    </div>
+
+    <div id="test" class="page test">
+      <div>
+        <h1 id="testTitle" class="title">TestName</h1>
+        <p id="testDescription"></p>
+        <h2 id="testProgress">0/0</h2>
+        <p id="testQuestion" class="question">問題文</p>
+        <p id="answerInput" class="answer active"></p>
+        <input type="text" id="answerInputbox" class="answer" inputmode="none" autocomplete="off" />
+        <div>
+          Type answer and press Enter to submit
+          <!-- <button id="clear">Clear</button>
+          <button id="checkAnswer">Check Answer<br />(Enter)</button>
+          <button id="exit">Exit</button> -->
+        </div>
+      </div>
+    </div>
+
+    <div id="result" class="page result">
+      <h1 id="resultTitle" class="title">TestName</h1>
+      <p id="resultDescription"></p>
+      <p id="resultStatus"></p>
+      <button id="finish" onclick="backToRoot()">Finish</button>
+    </div>
+  </body>
+</html>
