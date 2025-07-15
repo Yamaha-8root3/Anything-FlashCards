@@ -4,6 +4,7 @@ interface filter_setting {
   wordTo: number;
   random: boolean;
   initials: boolean;
+  enable_Keyboard: boolean;
 }
 interface testStatus {
   testSize: number;
@@ -51,54 +52,64 @@ const openDB = (): Promise<IDBDatabase> => {
   });
 };
 async function savetoDB(key: string, data: unknown) {
-  db = db ?? (await openDB());
+  try {
+    db = db ?? (await openDB());
 
-  // FileSystemHandle（Directory/File）の場合
-  if (data && typeof data === "object" && "requestPermission" in data && typeof (data as any).requestPermission === "function") {
-    const handle = data as any;
-    const perm = await handle.queryPermission?.({ mode: "readwrite" });
-    if (perm !== "granted") {
-      const request = await handle.requestPermission?.({ mode: "readwrite" });
-      if (request !== "granted") {
-        console.warn("Permission denied for handle");
-        return;
+    // FileSystemHandle（Directory/File）の場合
+    if (data && typeof data === "object" && "requestPermission" in data && typeof (data as any).requestPermission === "function") {
+      const handle = data as any;
+      const perm = await handle.queryPermission?.({ mode: "readwrite" });
+      if (perm !== "granted") {
+        const request = await handle.requestPermission?.({ mode: "readwrite" });
+        if (request !== "granted") {
+          console.warn("Permission denied for handle");
+          return;
+        }
       }
+      const tx = db.transaction("handles", "readwrite");
+      tx.objectStore("handles").put(handle, key);
+      console.log(`Saved handle with key: ${key}`);
+    } else {
+      // 通常のオブジェクトなど
+      const tx = db.transaction("handles", "readwrite");
+      tx.objectStore("handles").put(data, key);
+      console.log(`Saved plain data with key: ${key}`);
     }
-    const tx = db.transaction("handles", "readwrite");
-    tx.objectStore("handles").put(handle, key);
-    console.log(`Saved handle with key: ${key}`);
-  } else {
-    // 通常のオブジェクトなど
-    const tx = db.transaction("handles", "readwrite");
-    tx.objectStore("handles").put(data, key);
-    console.log(`Saved plain data with key: ${key}`);
+  } catch (e) {
+    console.error(e);
+    return;
   }
 }
 async function loadfromDB(key: string): Promise<unknown> {
-  db = db ?? (await openDB());
-  const tx = db.transaction("handles", "readonly");
-  const req = tx.objectStore("handles").get(key);
-  // console.log(req);
-  return new Promise((resolve) => {
-    req.onsuccess = async () => {
-      const data = req.result;
-      if (!data) return resolve(null);
+  try {
+    db = db ?? (await openDB());
+    const tx = db.transaction("handles", "readonly");
+    const req = tx.objectStore("handles").get(key);
+    // console.log(req);
+    return new Promise((resolve) => {
+      req.onsuccess = async () => {
+        const data = req.result;
+        if (!data) return resolve(null);
 
-      if (data && typeof data === "object" && "requestPermission" in data && typeof (data as any).requestPermission === "function") {
-        const permission = await data.queryPermission?.({ mode: "readwrite" });
-        if (permission === "granted") {
-          resolve(data);
+        if (data && typeof data === "object" && "requestPermission" in data && typeof (data as any).requestPermission === "function") {
+          const permission = await data.queryPermission?.({ mode: "readwrite" });
+          if (permission === "granted") {
+            resolve(data);
+          } else {
+            const request = await data.requestPermission?.({ mode: "readwrite" });
+            resolve(request === "granted" ? data : null);
+          }
         } else {
-          const request = await data.requestPermission?.({ mode: "readwrite" });
-          resolve(request === "granted" ? data : null);
+          // 通常のオブジェクトなど
+          resolve(data);
         }
-      } else {
-        // 通常のオブジェクトなど
-        resolve(data);
-      }
-    };
-    req.onerror = () => resolve(null);
-  });
+      };
+      req.onerror = () => resolve(null);
+    });
+  } catch (e) {
+    console.error(e);
+    return new Promise((resolve) => resolve(null));
+  }
 }
 async function debugListKeys(): Promise<void> {
   db = db ?? (await openDB());
@@ -428,7 +439,8 @@ async function saveFilter() {
   const wordTo = parseInt((document.getElementById("wordTo") as HTMLInputElement).value, 10);
   const random = (document.getElementById("random") as HTMLInputElement).checked;
   const initials = (document.getElementById("initials") as HTMLInputElement).checked;
-  filterData = { wordFrom, wordTo, random, initials };
+  const enable_Keyboard = (document.getElementById("enable_Keyboard") as HTMLInputElement).checked;
+  filterData = { wordFrom, wordTo, random, initials, enable_Keyboard };
 
   await savetoDB("filterData", filterData);
   console.log("Filter data saved:", filterData);
@@ -442,6 +454,7 @@ async function loadFilter() {
     (document.getElementById("wordTo") as HTMLInputElement).value = filterData.wordTo.toString();
     (document.getElementById("random") as HTMLInputElement).checked = filterData.random;
     (document.getElementById("initials") as HTMLInputElement).checked = filterData.initials;
+    (document.getElementById("enable_Keyboard") as HTMLInputElement).checked = filterData.enable_Keyboard;
     console.log("Filter data loaded:", filterData);
   } else {
     console.log("No filter data found, using defaults.");
@@ -453,7 +466,9 @@ function startTest() {
   const rootPage = document.getElementById("root") as HTMLDivElement;
   rootPage.classList.remove("active");
   testPage.classList.add("active");
-  Keyboard.open("", {}, {});
+  if (filterData.enable_Keyboard) {
+    Keyboard.open("", {}, {});
+  }
 
   const testTitle = document.getElementById("testTitle") as HTMLLabelElement;
   testTitle.innerHTML = fileHeader[3];
@@ -487,6 +502,7 @@ function nextProblem() {
   }
   const testProgress = document.getElementById("testProgress") as HTMLLabelElement;
   const testQuestion = document.getElementById("testQuestion") as HTMLLabelElement;
+  const questionDescription = document.getElementById("questionDescription") as HTMLParagraphElement;
   const answerInput = document.getElementById("answerInput") as HTMLLabelElement;
   test.current++;
   testProgress.innerHTML = `${test.current}/${test.roundSize}`;
@@ -516,11 +532,14 @@ function nextProblem() {
   });
   testQuestion.innerHTML = `${q1}<br>${q2}`; // 問題文は3列目
   answerInput.innerHTML = "";
+  questionDescription.innerHTML = "";
   answerInput.classList.add("typeable");
 }
 
 function checkAnswer() {
   const answerInput = document.getElementById("answerInput") as HTMLLabelElement;
+  const questionDescription = document.getElementById("questionDescription") as HTMLParagraphElement;
+  questionDescription.innerHTML = `${dataHeader[1]} ${test.pool[test.currentPoolIndex][1]}`;
   answerInput.classList.remove("typeable");
   // console.log(test.answer);
   if (answerInput.textContent.trim() === test.answer.trim()) {
@@ -566,6 +585,7 @@ function backToRoot() {
 //-----------------------------------------------------------------
 window.onload = async () => {
   await debugListKeys();
+  Keyboard.init();
   await loadFilter();
   await loadWordDataList();
   document.body.addEventListener("keydown", (e) => {
@@ -594,6 +614,5 @@ window.onload = async () => {
       }
     }
   });
-  Keyboard.init();
   // startTest();
 };

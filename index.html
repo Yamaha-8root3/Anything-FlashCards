@@ -3,34 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>なんでもFlashCards v1.00</title>
+    <title>なんでもFlashCards v1.01</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <script src="main.js"></script>
   </head>
   <body>
-    <h1 class="title">なんでもFlashCards v1.00</h1>
+    <h1 class="title">なんでもFlashCards v1.01</h1>
     <div id="root" class="page root active">
       <div>
         <p>
           csv形式で作成した単語テストを実行できるWebアプリです<br />
           問題データを自分で作成することもできます<br />
-          カスタム作問が可能のため問題のダウンロードが必須となってしまいますが一度設定すればずっと使えます
+          カスタム作問が可能のため現在問題のダウンロードが必須となってしまいますが一度設定すればずっと使えます<br />
+          (ios非対応の可能性が高いです。今後ダウンロードなしで使えるデータを用意する予定です)<br />
         </p>
-        <a href="https://drive.google.com/drive/folders/1IUnjADMPMu0oYnbcgvYCyQOCTo_BF5XR?usp=sharing">問題データの例はこちら</a>
+        <a href="https://drive.google.com/drive/folders/18Mbf0uaFal7YH6uXdmbz-fkO4h0SXAmL?usp=sharing">問題データの例(今後追加)</a>
+        <br />
+        <a href="https://github.com/Yamaha-8root3/Anything-FlashCards">README/更新履歴(Github)</a>
         <p>某T氏が某英単語テストサイトを落としたことで本格的に作ろうと思いました</p>
         <p>
           How to Use<br />
           1.csv問題データをダウンロードしてください(上記リンクから)<br />
           2.問題フォルダを選択からダウンロードしたファイルがあるフォルダを選択してください<br />
           (問題ファイル用のフォルダを作ることをお勧めします)
-        </p>
-        <p>
-          注意<br />
-          問題データはまだ全然できてません<br />
-          テストしたい方はドライブ内の問題データをダウンロードしてください<br />
-          (No.1501～1510しかまだ動きません)
         </p>
       </div>
       <div>
@@ -39,7 +36,7 @@
         </select>
         <button id="selectWordDataFolder" onclick="selectWordDataFolder()" class="">問題フォルダの選択</button>
         <p></p>
-        <button id="reloadFileList" onclick="loadWordDataList()" class="">Reload</button>
+        <button id="reloadFileList" onclick="loadWordDataList()" class="">Reload(再読み込み/前回のフォルダ情報を読み込む)</button>
       </div>
 
       <div>
@@ -66,6 +63,11 @@
           <span class="checkmark"></span>
           +INITIALS 頭文字の表示
         </label>
+        <label class="checkbox-container">
+          <input type="checkbox" id="enable_Keyboard" onchange="saveFilter()" />
+          <span class="checkmark"></span>
+          仮想キーボードの有効化(キーボードなしのデバイスでは必須)
+        </label>
       </div>
 
       <div>
@@ -86,7 +88,8 @@
         <p id="answerInput" class="answer active"></p>
         <input type="text" id="answerInputbox" class="answer" inputmode="none" autocomplete="off" />
         <div>
-          Type answer and press Enter to submit
+          <p>Type answer and press Enter to submit</p>
+          <p id="questionDescription"></p>
           <!-- <button id="clear">Clear</button>
           <button id="checkAnswer">Check Answer<br />(Enter)</button>
           <button id="exit">Exit</button> -->
