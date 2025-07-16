@@ -1,5 +1,7 @@
 # なんでも FlashCard
 
+[Use NOW!!](https://yamaha-8root3.github.io/Anything-FlashCards/)
+
 csv 形式のデータでなんでもテストにしてしまおう‼
 
 ## Changelog 更新履歴
@@ -17,4 +19,5 @@ csv 形式のデータでなんでもテストにしてしまおう‼
 ### 1.00
 
 2020/07/13<br>
+
 初回リリース
